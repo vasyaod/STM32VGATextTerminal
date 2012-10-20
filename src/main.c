@@ -1,7 +1,10 @@
 /**
- * Link: difur.ru
+ * STM32VGATextTerminal
+ *
+ * Link: https://github.com/vasyaod/STM32VGATextTerminal
  * Author: vasyaod (vasyaod@mail.ru)
  */
+
 #include <stm32f10x_rcc.h>
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_tim.h>
@@ -11,10 +14,6 @@
 #include <misc.h>
 
 #include <stdlib.h>
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/times.h>
-#include <sys/unistd.h>
 
 #include "AsciiLib.h"
 
@@ -44,23 +43,6 @@ uint8_t screenBufferPositionY= 0;
 
 int SysTickDelay;
 
-caddr_t _sbrk_r ( struct _reent *ptr, int incr )
-{
-  extern int _end;
-  static unsigned char *heap = NULL;
-  unsigned char *prev_heap;
-
-  if (heap == NULL) {
-    heap = (unsigned char *)&_end;
-  }
-  prev_heap = heap;
-  /* check removed to show basic approach */
-  heap += incr;
-
-  return (caddr_t) prev_heap;
-}
-
-
 //------------------------------------------------------------------------
 void Delay( unsigned int Val)
 {
@@ -79,7 +61,6 @@ void SysTick_Handler(void)
 
 void initPWM(void)
 {
-	int i = 2;
 	// Включает тактирование порта для вывода синхро сигналов.
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC , ENABLE);
 
@@ -176,100 +157,6 @@ void initPWM(void)
 
 
 }
-/*
-void initFSMC() {
-
-	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE | RCC_APB2Periph_AFIO, ENABLE);
-	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 |
-	                               GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 |
-	                              GPIO_Pin_15;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_Init(GPIOE, &GPIO_InitStructure);
-
-	// PD.00(D2), PD.01(D3), PD.04(RD), PD.5(WR), PD.7(CS), PD.8(D13), PD.9(D14),
-	//   PD.10(D15), PD.11(RS) PD.14(D0) PD.15(D1)
-	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_7 |
-	                               GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 |
-	                               GPIO_Pin_14 | GPIO_Pin_15;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_Init(GPIOD, &GPIO_InitStructure);
-
-	// Включим тактирование FSMC
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
-
-	FSMC_NORSRAMInitTypeDef  FSMC_NORSRAMInitStructure;
-	FSMC_NORSRAMTimingInitTypeDef FSMC_NORSRAMReadWriteTimingInitStructure;
-	FSMC_NORSRAMTimingInitTypeDef FSMC_NORSRAMWriteTimingStructure;
-
-	FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct = &FSMC_NORSRAMReadWriteTimingInitStructure;
-//	FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct = &FSMC_NORSRAMWriteTimingStructure;
-
-//	FSMC_NORSRAMStructInit(&FSMC_NORSRAMInitStructure);
-
-	FSMC_NORSRAMReadWriteTimingInitStructure.FSMC_AddressSetupTime = 0;
-	FSMC_NORSRAMReadWriteTimingInitStructure.FSMC_AddressHoldTime = 0;
-	FSMC_NORSRAMReadWriteTimingInitStructure.FSMC_DataSetupTime = 1;
-	FSMC_NORSRAMReadWriteTimingInitStructure.FSMC_BusTurnAroundDuration = 0x00;
-	FSMC_NORSRAMReadWriteTimingInitStructure.FSMC_CLKDivision = 0x00;
-	FSMC_NORSRAMReadWriteTimingInitStructure.FSMC_DataLatency = 0x00;
-	FSMC_NORSRAMReadWriteTimingInitStructure.FSMC_AccessMode = FSMC_AccessMode_A;
-
-	FSMC_NORSRAMInitStructure.FSMC_Bank = FSMC_Bank1_NORSRAM1;
-	FSMC_NORSRAMInitStructure.FSMC_DataAddressMux = FSMC_DataAddressMux_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_MemoryType = FSMC_MemoryType_SRAM;
-	FSMC_NORSRAMInitStructure.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_16b;
-	FSMC_NORSRAMInitStructure.FSMC_BurstAccessMode = FSMC_BurstAccessMode_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
-	FSMC_NORSRAMInitStructure.FSMC_WrapMode = FSMC_WrapMode_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_WaitSignalActive = FSMC_WaitSignalActive_BeforeWaitState;
-	FSMC_NORSRAMInitStructure.FSMC_WriteOperation = FSMC_WriteOperation_Enable;
-	FSMC_NORSRAMInitStructure.FSMC_WaitSignal = FSMC_WaitSignal_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_AsynchronousWait = FSMC_AsynchronousWait_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_ExtendedMode = FSMC_ExtendedMode_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_WriteBurst = FSMC_WriteBurst_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct = &FSMC_NORSRAMReadWriteTimingInitStructure;
-
-	FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure);
-
-	// Enable FSMC Bank1_SRAM Bank
-	FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM1, ENABLE);
-
-	// Включим тактирование DMA
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-
-	DMA_InitTypeDef DMA_InitStructure;
-//	DMA_StructInit(&DMA_InitStructure);
-	DMA_DeInit(DMA1_Channel1);
-//	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)SRC_Const_Buffer;
-//	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&(GPIOC->ODR);
-
-	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)Bank1_SRAM1_ADDR;
-	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)Bank1_SRAM1_ADDR;
-	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-	DMA_InitStructure.DMA_BufferSize = bufferSize;
-	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Enable;
-	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Disable;
-	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular; //DMA_Mode_Normal;
-	DMA_InitStructure.DMA_Priority = DMA_Priority_High;
-	DMA_InitStructure.DMA_M2M = DMA_M2M_Enable;
-	DMA_Init(DMA1_Channel1, &DMA_InitStructure);
-
-	// Enable DMA2 Channel5 Transfer Complete interrupt
-//	DMA_ITConfig(DMA1_Channel1, DMA_IT_TC | DMA_IT_TE, ENABLE);
-//	NVIC_EnableIRQ(DMA1_Channel1_IRQn);
-
-	DMA_Cmd(DMA1_Channel1, ENABLE);
-//	while(!DMA_GetFlagStatus(DMA1_FLAG_TC1)) {
-//		uint16_t t = DMA_GetCurrDataCounter(DMA1_Channel1);
-//		GPIOC->ODR ^= GPIO_Pin_0;
-//	};
-}
-//  */
 
 void initSPI()
 {
@@ -531,6 +418,7 @@ int main(void)
 	PORT.GPIO_Mode = GPIO_Mode_Out_PP;
 	PORT.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init( GPIOB , &PORT);
+
 
 	SysTick_Config(SystemCoreClock /1000);//1ms
 	initBuffers();
