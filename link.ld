@@ -1,7 +1,12 @@
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
-SEARCH_DIR(..)
-INCLUDE "memory.ld"
 
+MEMORY
+{
+    rom (rx)  : ORIGIN = 0x08000000, LENGTH = 0x00040000
+    ram (rwx) : ORIGIN = 0x20000000, LENGTH = 0x0000c000
+}
+
+_eram = 0x20000000 + 0x0000c000;
 end = _eram - 0x101;
 
 /* Section Definitions */ 
@@ -46,5 +51,4 @@ SECTIONS
     . = ALIGN(4); 
     _end = .;
     __end__ = .;
-    
 } 
