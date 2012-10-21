@@ -35,7 +35,7 @@ VGAParamsType VGAParams = {
 	96,     // hSync pulse
 	2,      // vSync pulse
 	135,    // Back porch
-	AsciiLib,
+	AsciiLib, // Symbol table
 	80,     // Text resolution of X axis
 	30      // Text resolution of Y axis
 };
@@ -298,7 +298,7 @@ void initBuffers()
 	int i;
 	// Заполним буффер начальными данными.
 	for (i = 0; i< VGAParams.textResolutionX*VGAParams.textResolutionY; i++) {
-		VGAScreenBuffer[i] = 1;
+		VGAScreenBuffer[i] = 0;
 	}
 }
 

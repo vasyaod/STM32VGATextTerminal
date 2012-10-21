@@ -12,17 +12,14 @@
 #include <misc.h>
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "AsciiLib.h"
 #include "VGA.h"
+#include "Terminal.h"
 
-#define Bank1_SRAM1_ADDR    ((uint32_t)0x60000000)
-
-uint8_t screenBufferPositionX = 0;
-uint8_t screenBufferPositionY = 0;
-
-uint8_t resolutionX;
-uint8_t resolutionY;
+extern uint8_t resolutionX;
+extern uint8_t resolutionY;
 
 int SysTickDelay;
 
@@ -87,44 +84,14 @@ void initUART()
 
 }
 void USART1_IRQHandler() {
-	GPIOB->ODR ^= GPIO_Pin_1;
 	if (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == SET) {
 
 		// Читаем принятые данные и сбрасываем флаг.
 		uint8_t data = USART_ReceiveData(USART1);
 		USART_ClearFlag(USART1, USART_FLAG_RXNE);
-
-		if (data >= 32 &&  data <= 94+32)
-		{
-			VGAScreenBuffer[screenBufferPositionX+screenBufferPositionY*resolutionX] = data-32;
-			screenBufferPositionX++;
-		}
-
-		// Что то вики, как то припездывает....
-		// LF (ASCII 0x0A) - перевод строки (xUNIX);
-		// CR (0x0D) - возврат каретки;
-		// CR+LF (ASCII 0x0D 0x0A) - windows, dos ...
-		else if(data == 0x0A)
-		{
-		//	screenBufferPositionY++;
-		//	screenBufferPositionX = 0;		// Вернем корретку
-		}
-		else if(data == 0x0D)
-		{
-			screenBufferPositionY++;
-			screenBufferPositionX = 0;		// Вернем корретку
-			// При возврате корретки ничего не делаем.
-
-			// Что то вики, как то припездывает....
-		}
-
-		if (screenBufferPositionX >= 80)
-			screenBufferPositionX = 79;
-		if (screenBufferPositionY >= 30)
-			screenBufferPositionY = 29;
+		TerminalPutchar(data);
 	}
 }
-
 
 int main(void)
 {
@@ -138,12 +105,16 @@ int main(void)
 
 	SysTick_Config(SystemCoreClock /1000);//1ms
 
-	initUART();
 	VGAInit();
+	TerminalPrintf("VGA output inited.\n");
 	resolutionX = VGAParams.textResolutionX;
 	resolutionY = VGAParams.textResolutionY;
 
+	initUART();
+	TerminalPrintf("UART inited.\n");
+
 	GPIOB->ODR ^= GPIO_Pin_0;	// Посветим индикатором в знак того, что все успешно инициалазировалось.
+	TerminalPrintf("Welcome to STR32 Text termital!\n");
 
 	while(1)
 	{
