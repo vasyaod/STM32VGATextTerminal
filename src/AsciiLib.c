@@ -420,13 +420,13 @@ unsigned char const AsciiLib[95][16] = {
 /*******************************************************************************
 * Function Name  : GetASCIICode
 * Description    : ȡASCII�� ���
-* Input          : - ASCII: �����ASCII�룬��'A',BaseAddr ��ַ ��ASCII��ʾ������FLASH�еĴ洢λ�� 
+* Input          : - ASCII: �����ASCII�룬��'A',BaseAddr ��ַ ��ASCII��ʾ������FLASH�еĴ洢λ��
 * Output         : - *pBuffer: �����ݵ�ָ��
 * Return         : None
 * Attention		 : None
 *******************************************************************************/
 void GetASCIICode(unsigned char* pBuffer,unsigned char ASCII)
-{  
+{
    memcpy(pBuffer,AsciiLib[(ASCII - 32)] ,16);
 }
 
