@@ -65,7 +65,7 @@ void initUART()
 //	USART_ClockInit(USART1, &USART_ClockInitStructure);
 
 	USART_InitTypeDef USART_InitStructure;
-	USART_InitStructure.USART_BaudRate = 115200;
+	USART_InitStructure.USART_BaudRate = 9600;
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
 	USART_InitStructure.USART_Parity = USART_Parity_No ;
@@ -105,10 +105,14 @@ int main(void)
 
 	SysTick_Config(SystemCoreClock /1000);//1ms
 
-	VGAInit();
-	TerminalPrintf("VGA output inited.\n");
 	resolutionX = VGAParams.textResolutionX;
 	resolutionY = VGAParams.textResolutionY;
+
+	VGAInit();
+	TerminalPrintf("VGA output inited.\n");
+
+	TerminalInit();
+	TerminalPrintf("Terminal emulation inited.\n");
 
 	initUART();
 	TerminalPrintf("UART inited.\n");

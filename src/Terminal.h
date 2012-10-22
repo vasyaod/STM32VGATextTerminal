@@ -12,5 +12,6 @@
 
 void TerminalPutchar(uint8_t data);
 void TerminalPrintf(char *str);
+void TerminalInit();
 
 #endif   // TERMINAL_H
