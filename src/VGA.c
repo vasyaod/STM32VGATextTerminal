@@ -95,19 +95,19 @@ void initPWM(void)
 	timer_oc.TIM_Pulse = VGAParams.hSyncPulse * factopr;
 	timer_oc.TIM_OCMode = TIM_OCMode_PWM1;
 	timer_oc.TIM_OutputState = TIM_OutputState_Enable;
-	TIM_OC3Init(TIM5, &timer_oc);
+	TIM_OC4Init(TIM5, &timer_oc);
 
 	TIM_OCStructInit(&timer_oc);
 	timer_oc.TIM_Pulse = VGAParams.hBackPorch * factopr;
 	timer_oc.TIM_OCMode = TIM_OCMode_Active;
-	TIM_OC4Init(TIM5, &timer_oc);
+	TIM_OC3Init(TIM5, &timer_oc);
 
 	TIM_SelectSlaveMode(TIM5, TIM_SlaveMode_Reset);
 	// Выбираем вход триггера от TIM2 (ITR0)
 	TIM_SelectInputTrigger(TIM5, TIM_TS_ITR0);
 
 	/* Включаем прерывание переполнения счётчика */
-	TIM_ITConfig(TIM5, TIM_IT_Update | TIM_IT_CC4, ENABLE);
+	TIM_ITConfig(TIM5, TIM_IT_Update | TIM_IT_CC3, ENABLE);
 	NVIC_SetPriority(TIM5_IRQn, 15);
 	NVIC_EnableIRQ(TIM5_IRQn);
 
@@ -213,10 +213,10 @@ void DMA1_Channel3_IRQHandler() {
 void TIM5_IRQHandler()
 {
 	//	if (TIM_GetITStatus(TIM5, TIM_IT_CC4) != RESET)
-	if ((TIM5->SR & TIM_IT_CC4) != 0)
+	if ((TIM5->SR & TIM_IT_CC3) != 0)
 	{
 //		TIM_ClearITPendingBit(TIM5, TIM_IT_CC4);
-		TIM5->SR = (uint16_t)~TIM_IT_CC4;
+		TIM5->SR = (uint16_t)~TIM_IT_CC3;
 //		DMA_Cmd(DMA1_Channel3, DISABLE);
 //		DMA1_Channel3->CCR &= (uint16_t)(~DMA_CCR1_EN);
 //		DMA_SetCurrDataCounter(DMA1_Channel3, 81);
