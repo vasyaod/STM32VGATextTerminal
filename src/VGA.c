@@ -255,6 +255,8 @@ void TIM5_IRQHandler()
 
 	//		DMA_Cmd(DMA1_Channel3, DISABLE);
 			DMA1_Channel3->CCR &= (uint16_t)(~DMA_CCR1_EN);     // Выключаем DMA.
+			DMA_ClearFlag(DMA1_FLAG_TC3);
+			DMA_ClearFlag(DMA1_FLAG_HT3);
 	//		DMA_SetCurrDataCounter(DMA1_Channel3, 21);
 			DMA1_Channel3->CNDTR = VGAParams.textResolutionX+1;               // Устанавливаем новое значение счетчика данных DMA.
 			DMA1_Channel3->CMAR = (uint32_t)currentBuffer;      // Передаем адрес нового буффера.

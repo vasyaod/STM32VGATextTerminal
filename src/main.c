@@ -23,23 +23,6 @@ extern uint8_t resolutionY;
 
 int SysTickDelay;
 
-//------------------------------------------------------------------------
-void Delay( unsigned int Val)
-{
-   SysTickDelay = Val;
-   while (SysTickDelay != 0) {};
-}
-
-//------------------------------------------------------------------------
-void SysTick_Handler(void)
-{
-	if (SysTickDelay != 0)
-	{
-		SysTickDelay--;
-	}
-}
-
-
 void initUART()
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -102,8 +85,6 @@ int main(void)
 	PORT.GPIO_Mode = GPIO_Mode_Out_PP;
 	PORT.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init( GPIOB , &PORT);
-
-	SysTick_Config(SystemCoreClock /1000);//1ms
 
 	resolutionX = VGAParams.textResolutionX;
 	resolutionY = VGAParams.textResolutionY;
