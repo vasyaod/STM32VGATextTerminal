@@ -6,6 +6,7 @@
  *       Link: https://github.com/vasyaod/STM32VGATextTerminal
  */
 #include <stdlib.h>
+#include <string.h>
 
 #include "Terminal.h"
 #include "VGA.h"
@@ -139,7 +140,8 @@ void TerminalPutchar(uint8_t data)
 		cursorX = resolutionX-1;
 	}
 	if (cursorY >= resolutionY) {
-//		memcpy()
+		memmove(VGAScreenBuffer, VGAScreenBuffer+resolutionX, resolutionX*(resolutionY-1));
+		memset(VGAScreenBuffer+resolutionX*(resolutionY-1), 0x0, resolutionX);
 		cursorY = resolutionY-1;
 	}
 }
