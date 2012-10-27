@@ -50,12 +50,37 @@ void TerminalEscapeProcessing()
 	uint8_t code1 = buffer[1];
 	uint8_t code2 = buffer[bufLen-1];
 
-	if (code1 == '[' && code2 == 'H')    // Переводит курсор в указанное положение.
+	// Esc[Line;ColumnH - переводит курсор в указанное положение.
+	// Esc[Line;Columnf - переводит курсор в указанное положение.
+	if (code1 == '[' && (code2 == 'H' || code2 == 'f'))
 	{
 		if (escapeParametersCount == 2)
 		{
 			cursorY = escapeParameter1 - 1;
 			cursorX = escapeParameter2 - 1;
+		}
+		return;
+	}
+
+	// Очистка экрана.
+	// Esc[J - Clear screen from cursor down
+	// Esc[0J - Clear screen from cursor down
+	// Esc[1J - Clear screen from cursor up
+	// Esc[2J - Clear entire screen
+	if (code1 == '[' && code2 == 'J')    // Переводит курсор в указанное положение.
+	{
+		if (escapeParametersCount == 0 ||
+		    (escapeParametersCount == 1 && escapeParameter1 == 0))
+		{
+			// ... не реализовано ...
+		}
+		else if (escapeParametersCount == 1 && escapeParameter1 == 1)
+		{
+			// ... не реализовано ...
+		}
+		else if (escapeParametersCount == 1 && escapeParameter1 == 2)
+		{
+			memset(VGAScreenBuffer, 0x0, resolutionX*resolutionY);
 		}
 		return;
 	}
