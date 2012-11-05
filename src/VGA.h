@@ -38,9 +38,39 @@ typedef struct {
 } VGAParamsType;
 
 extern VGAParamsType VGAParams;
-extern uint8_t *VGAScreenBuffer;
 
+/**
+ * Инициализирует микроконтроллер для вывода изображения на экран.
+ */
 void VGAInit();
 void VGARender();
+
+/**
+ * Функция выводит символ из таблицы символов (VGAParams.symbolTable) в указанную
+ * позицию экрана.
+ *
+ * Нумерация координат начинается в 0.
+ */
+void VGAPrintChar(uint8_t x, uint8_t y, uint8_t ch);
+
+/**
+ * Заполняет весь экран указаннам символом из таблицы (VGAParams.symbolTable).
+ */
+void VGAFillScreen(uint8_t ch);
+
+/**
+ * Заполняет указанную строку символом из таблицы (VGAParams.symbolTable).
+ */
+void VGAFillRow(uint8_t y, uint8_t ch);
+
+/**
+ * Копирует область экрана из одних координат в другие.
+ *
+ * ВНИМАНИЕ!!! Функция реализована не правельно, это еще предстоит сделать (исправить).
+ */
+void VGAMoveRange(uint8_t width, uint8_t height,
+                    uint8_t sourceX, uint8_t sourceY,
+                    uint8_t destinationX, uint8_t destinationY);
+
 
 #endif

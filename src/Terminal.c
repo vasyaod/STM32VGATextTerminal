@@ -58,7 +58,19 @@ void TerminalEscapeProcessing()
 		{
 			cursorY = escapeParameter1 - 1;
 			cursorX = escapeParameter2 - 1;
+
 		}
+
+		if (cursorX < 0)
+			cursorX = 0;
+		else if (cursorX >= resolutionX)
+			cursorX = resolutionX-1;
+
+		if (cursorY < 0)
+			cursorY = 0;
+		else if (cursorY >= resolutionY)
+			cursorY = resolutionY-1;
+
 		return;
 	}
 
@@ -80,7 +92,7 @@ void TerminalEscapeProcessing()
 		}
 		else if (escapeParametersCount == 1 && escapeParameter1 == 2)
 		{
-			memset(VGAScreenBuffer, 0x0, resolutionX*resolutionY);
+			VGAFillScreen(0);
 		}
 		return;
 	}
@@ -132,7 +144,7 @@ void TerminalPutchar(uint8_t data)
 	}
 	else if (data >= 32 &&  data <= 94+32)
 	{
-		VGAScreenBuffer[cursorX+cursorY*resolutionX] = data-32;
+		VGAPrintChar(cursorX, cursorY, data-32);
 		cursorX++;
 	}
 
@@ -165,8 +177,10 @@ void TerminalPutchar(uint8_t data)
 		cursorX = resolutionX-1;
 	}
 	if (cursorY >= resolutionY) {
-		memmove(VGAScreenBuffer, VGAScreenBuffer+resolutionX, resolutionX*(resolutionY-1));
-		memset(VGAScreenBuffer+resolutionX*(resolutionY-1), 0x0, resolutionX);
+		VGAMoveRange(resolutionX, resolutionY-1,
+					 0,1,
+					 0,0);
+		VGAFillRow(resolutionY-1, 0x0);
 		cursorY = resolutionY-1;
 	}
 }

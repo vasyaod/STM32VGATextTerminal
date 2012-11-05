@@ -7,6 +7,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include <stm32f10x_rcc.h>
 #include <stm32f10x_gpio.h>
@@ -330,7 +331,43 @@ void VGAInit()
 	initPWM();
 }
 
-uint8_t *VGAGetScreenBuffer()
+/**
+ * Функция выводит символ из таблицы символов (VGAParams.symbolTable) в указанную
+ * позицию экрана.
+ *
+ * Нумерация координат начинается в 0.
+ */
+void VGAPrintChar(uint8_t x, uint8_t y, uint8_t ch)
 {
-	return VGAScreenBuffer;
+	VGAScreenBuffer[x+y*VGAParams.textResolutionX] = ch;
 }
+
+/**
+ * Заполняет весь экран указаннам символом из таблицы (VGAParams.symbolTable).
+ */
+void VGAFillScreen(uint8_t ch)
+{
+	memset(VGAScreenBuffer, ch, VGAParams.textResolutionX*VGAParams.textResolutionY);
+}
+
+/**
+ * Заполняет указанную строку символом из таблицы (VGAParams.symbolTable).
+ */
+void VGAFillRow(uint8_t y, uint8_t ch)
+{
+	memset(VGAScreenBuffer+VGAParams.textResolutionX*y, 0x0, VGAParams.textResolutionX);
+}
+
+/**
+ * Копирует область экрана из одних координат в другие.
+ *
+ * ВНИМАНИЕ!!! Функция реализована не правельно, это еще предстоит сделать (исправить).
+ */
+void VGAMoveRange(uint8_t width, uint8_t height,
+                    uint8_t sourceX, uint8_t sourceY,
+                    uint8_t destinationX, uint8_t destinationY)
+{
+	memmove(VGAScreenBuffer, VGAScreenBuffer+VGAParams.textResolutionX, VGAParams.textResolutionX*(VGAParams.textResolutionY-1));
+//	memset(VGAScreenBuffer+VGAParams.textResolutionX*y, 0x0, VGAParams.textResolutionX);
+}
+
